@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
-  "id": "modid",
+  "id": "exmateria",
   "version": "${version}",
 
   "name": "Ex Materia",
   "description": "Resource generation for skyblock.",
   "authors": [
-    "Me!"
+    "FreeFull"
   ],
   "contact": {
     "homepage": "https://github.com/FreeFull/exmateria",
@@ -14,7 +14,7 @@
   },
 
   "license": "MIT",
-  "icon": "assets/modid/icon.png",
+  "icon": "assets/exmateria/icon.png",
 
   "environment": "*",
   "entrypoints": {
@@ -23,7 +23,7 @@
     ]
   },
   "mixins": [
-    "modid.mixins.json"
+    "exmateria.mixins.json"
   ],
 
   "requires": {
