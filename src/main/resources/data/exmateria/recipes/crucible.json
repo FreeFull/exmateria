@@ -1,0 +1,16 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        "s s",
+        "s s",
+        "sss"
+    ],
+    "key": {
+        "s": {
+            "item": "minecraft:cobblestone"
+        }
+    },
+    "result": {
+        "item": "exmateria:crucible"
+    }
+}
