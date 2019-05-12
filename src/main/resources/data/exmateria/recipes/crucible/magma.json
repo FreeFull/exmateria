@@ -1,0 +1,10 @@
+{
+    "type": "exmateria:crucible",
+    "needs_heat": true,
+    "ingredient": {
+        "item": "minecraft:cobblestone"
+    },
+    "result": {
+        "item": "exmateria:crucible"
+    }
+}
