@@ -1,5 +1,6 @@
 package io.github.freefull.exmateria.server.block;
 
+import io.github.freefull.exmateria.ExMateria;
 import io.github.freefull.exmateria.server.recipe.CrucibleRecipe;
 import io.github.freefull.exmateria.server.recipe.ExMateriaRecipes;
 import net.minecraft.block.entity.BlockEntity;
@@ -17,7 +18,7 @@ import net.minecraft.util.registry.Registry;
 
 public class CrucibleBlockEntity extends BlockEntity implements SidedInventory, Tickable {
     static final BlockEntityType<CrucibleBlockEntity> TYPE = Registry.register(Registry.BLOCK_ENTITY,
-            "exmateria:crucible", BlockEntityType.Builder.create(CrucibleBlockEntity::new).build(null));
+            "exmateria:crucible", BlockEntityType.Builder.create(CrucibleBlockEntity::new, ExMateria.CRUCIBLE).build(null));
     private final DefaultedList<ItemStack> inventory = DefaultedList.create(2, ItemStack.EMPTY);
     private static final int[] AVAILABLE_SLOTS = { 0, 1 };
 
@@ -25,14 +26,18 @@ public class CrucibleBlockEntity extends BlockEntity implements SidedInventory, 
         super(TYPE);
     }
 
-    public void insertItems(ItemStack items) {
+    public boolean insertItems(ItemStack items) {
         ItemStack input = inventory.get(0);
         if(input.isEmpty()) {
             inventory.set(0, items.split(1));
+            return true;
         } else if (input.isEqualIgnoreTags(items) && input.getAmount() < getInvMaxStackAmount()) {
             input.addAmount(1);
             items.subtractAmount(1);
+            return true;
         }
+        System.out.print(inventory.get(0));
+        return false;
     }
 
     private boolean canAcceptRecipeOutput(CrucibleRecipe recipe) {
@@ -66,11 +71,15 @@ public class CrucibleBlockEntity extends BlockEntity implements SidedInventory, 
         }
     }
 
+    public void dropOutput() {
+        dropItems(inventory.get(1));
+    }
+
     private void dropItems(ItemStack items) {
         ItemStack toSpitOut = items.copy();
         items.setAmount(0);
         BlockPos pos = this.getPos();
-        ItemEntity itemEntity = new ItemEntity(world, pos.getX(), pos.getY() + 1.0, pos.getZ(), toSpitOut);
+        ItemEntity itemEntity = new ItemEntity(world, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, toSpitOut);
         world.spawnEntity(itemEntity);
     }
 
@@ -130,22 +139,16 @@ public class CrucibleBlockEntity extends BlockEntity implements SidedInventory, 
     public void tick() {
         if (!world.isClient) {
             ItemStack input = inventory.get(0);
-            ItemStack output = inventory.get(1);
-            if (!output.isEmpty()) {
-                dropItems(output);
-            }
             if (input.isEmpty()) {
                 return;
             }
             CrucibleRecipe recipe = world.getRecipeManager()
                     .getFirstMatch(ExMateriaRecipes.CRUCIBLE_RECIPE, this, world).orElse(null);
             if (recipe == null) {
+                dropItems(input);
                 return;
             }
             craftRecipe(recipe);
-            if(output.isEmpty()) {
-                dropItems(input);
-            }
         }
     }
 

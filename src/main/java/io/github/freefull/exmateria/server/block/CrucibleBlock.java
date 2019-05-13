@@ -1,6 +1,5 @@
 package io.github.freefull.exmateria.server.block;
 
-import io.github.freefull.exmateria.server.recipe.ExMateriaRecipes;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
@@ -29,6 +28,14 @@ public class CrucibleBlock extends BlockWithEntity {
         super(settings);
     }
 
+    private CrucibleBlockEntity getEntity(World world, BlockPos blockPos) {
+        BlockEntity blockEntity = world.getBlockEntity(blockPos);
+        if(blockEntity instanceof CrucibleBlockEntity) {
+            return (CrucibleBlockEntity)blockEntity;
+        }
+        return null;
+    }
+
     @Override
     public BlockRenderType getRenderType(BlockState blockState_1) {
         return BlockRenderType.MODEL;
@@ -49,6 +56,12 @@ public class CrucibleBlock extends BlockWithEntity {
     public boolean activate(BlockState blockState, World world, BlockPos blockPos, PlayerEntity playerEntity, Hand hand,
             BlockHitResult blockHitResult) {
         ItemStack itemStack = playerEntity.getStackInHand(hand);
+        CrucibleBlockEntity blockEntity = getEntity(world, blockPos);
+        if(blockEntity == null) {
+            return false;
+        }
+        blockEntity.dropOutput();
+
         if (itemStack.isEmpty() || world.isClient) {
             return true;
         } else {
@@ -57,11 +70,7 @@ public class CrucibleBlock extends BlockWithEntity {
             // TODO: Replace with JSON
             boolean hasHeat = blockBelow == Blocks.FIRE || blockBelow == Blocks.LAVA || blockBelow == Blocks.MAGMA_BLOCK
                     || (blockBelow == Blocks.CAMPFIRE && blockStateBelow.get(CampfireBlock.LIT));
-            BlockEntity blockEntity = world.getBlockEntity(blockPos);
-            if(blockEntity instanceof CrucibleBlockEntity) {
-                ((CrucibleBlockEntity)blockEntity).insertItems(itemStack);
-            }
-            return false;
+            return blockEntity.insertItems(itemStack);
         }
     }
 

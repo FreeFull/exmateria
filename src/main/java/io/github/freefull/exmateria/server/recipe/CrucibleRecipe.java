@@ -2,7 +2,7 @@ package io.github.freefull.exmateria.server.recipe;
 
 import com.google.gson.JsonObject;
 
-import net.minecraft.inventory.Inventory;
+import io.github.freefull.exmateria.server.block.CrucibleBlockEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.Ingredient;
 import net.minecraft.recipe.Recipe;
@@ -14,7 +14,7 @@ import net.minecraft.util.JsonHelper;
 import net.minecraft.util.PacketByteBuf;
 import net.minecraft.world.World;
 
-public class CrucibleRecipe implements Recipe<Inventory> {
+public class CrucibleRecipe implements Recipe<CrucibleBlockEntity> {
     private Identifier id;
     private boolean needsHeat;
     private Ingredient ingredient;
@@ -30,12 +30,12 @@ public class CrucibleRecipe implements Recipe<Inventory> {
     }
 
     @Override
-    public boolean matches(Inventory inventory, World world) {
+    public boolean matches(CrucibleBlockEntity inventory, World world) {
         return ingredient.test(inventory.getInvStack(0));
     }
 
     @Override
-    public ItemStack craft(Inventory inventory) {
+    public ItemStack craft(CrucibleBlockEntity inventory) {
         return result;
     }
 
