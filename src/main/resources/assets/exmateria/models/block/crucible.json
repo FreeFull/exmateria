@@ -1,5 +1,6 @@
 {
 	"credit": "Made with Blockbench",
+	"parent": "block/block",
 	"textures": {
 		"0": "exmateria:block/crucible/bottom",
 		"1": "exmateria:block/crucible/side",
