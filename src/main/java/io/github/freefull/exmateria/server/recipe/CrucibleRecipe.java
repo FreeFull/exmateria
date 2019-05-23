@@ -31,7 +31,7 @@ public class CrucibleRecipe implements Recipe<CrucibleBlockEntity> {
 
     @Override
     public boolean matches(CrucibleBlockEntity inventory, World world) {
-        return ingredient.test(inventory.getInvStack(0));
+        return ingredient.test(inventory.getInvStack(0)) && (inventory.isHot() == needsHeat);
     }
 
     @Override
@@ -70,7 +70,8 @@ public class CrucibleRecipe implements Recipe<CrucibleBlockEntity> {
             boolean needsHeat = JsonHelper.getBoolean(json, "needs_heat");
             JsonObject ingredient = JsonHelper.getObject(json, "ingredient");
             JsonObject result = JsonHelper.getObject(json, "result");
-            return new CrucibleRecipe(id, needsHeat, Ingredient.fromJson(ingredient), ShapedRecipe.getItemStack(result));
+            return new CrucibleRecipe(id, needsHeat, Ingredient.fromJson(ingredient),
+                    ShapedRecipe.getItemStack(result));
         }
 
         @Override

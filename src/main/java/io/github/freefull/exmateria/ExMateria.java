@@ -24,7 +24,8 @@ public class ExMateria implements ModInitializer {
 		// Proceed with mild caution.
 
 		Registry.register(Registry.BLOCK, new Identifier(MOD_ID, "crucible"), CRUCIBLE);
-		Registry.register(Registry.ITEM, new Identifier(MOD_ID, "crucible"), new BlockItem(CRUCIBLE, new Item.Settings().itemGroup(ItemGroup.MISC)));
+		Registry.register(Registry.ITEM, new Identifier(MOD_ID, "crucible"),
+				new BlockItem(CRUCIBLE, new Item.Settings().itemGroup(ItemGroup.MISC)));
 
 		ExMateriaRecipes.init();
 	}

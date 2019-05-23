@@ -1,6 +1,7 @@
 package io.github.freefull.exmateria.server.block;
 
 import io.github.freefull.exmateria.ExMateria;
+import io.github.freefull.exmateria.ExMateriaProperties;
 import io.github.freefull.exmateria.server.recipe.CrucibleRecipe;
 import io.github.freefull.exmateria.server.recipe.ExMateriaRecipes;
 import net.minecraft.block.entity.BlockEntity;
@@ -18,9 +19,11 @@ import net.minecraft.util.registry.Registry;
 
 public class CrucibleBlockEntity extends BlockEntity implements SidedInventory, Tickable {
     static final BlockEntityType<CrucibleBlockEntity> TYPE = Registry.register(Registry.BLOCK_ENTITY,
-            "exmateria:crucible", BlockEntityType.Builder.create(CrucibleBlockEntity::new, ExMateria.CRUCIBLE).build(null));
+            "exmateria:crucible",
+            BlockEntityType.Builder.create(CrucibleBlockEntity::new, ExMateria.CRUCIBLE).build(null));
     private final DefaultedList<ItemStack> inventory = DefaultedList.create(2, ItemStack.EMPTY);
     private static final int[] AVAILABLE_SLOTS = { 0, 1 };
+    private CrucibleRecipe cachedRecipe;
 
     public CrucibleBlockEntity() {
         super(TYPE);
@@ -28,7 +31,7 @@ public class CrucibleBlockEntity extends BlockEntity implements SidedInventory, 
 
     public boolean insertItems(ItemStack items) {
         ItemStack input = inventory.get(0);
-        if(input.isEmpty()) {
+        if (input.isEmpty()) {
             inventory.set(0, items.split(1));
             return true;
         } else if (input.isEqualIgnoreTags(items) && input.getAmount() < getInvMaxStackAmount()) {
@@ -38,6 +41,20 @@ public class CrucibleBlockEntity extends BlockEntity implements SidedInventory, 
         }
         System.out.print(inventory.get(0));
         return false;
+    }
+
+    public boolean isHot() {
+        return getCachedState().get(ExMateriaProperties.HOT);
+    }
+
+    private CrucibleRecipe getCachedRecipe() {
+        if (cachedRecipe != null && cachedRecipe.matches(this, world)) {
+            return cachedRecipe;
+        } else {
+            cachedRecipe = world.getRecipeManager().getFirstMatch(ExMateriaRecipes.CRUCIBLE_RECIPE, this, world)
+                    .orElse(null);
+            return cachedRecipe;
+        }
     }
 
     private boolean canAcceptRecipeOutput(CrucibleRecipe recipe) {
@@ -58,11 +75,11 @@ public class CrucibleBlockEntity extends BlockEntity implements SidedInventory, 
     }
 
     private void craftRecipe(CrucibleRecipe recipe) {
-        if(canAcceptRecipeOutput(recipe)) {
+        if (canAcceptRecipeOutput(recipe)) {
             ItemStack input = inventory.get(0);
             ItemStack output = inventory.get(1);
             ItemStack recipeOutput = recipe.craft(this);
-            if(output.isEmpty()) {
+            if (output.isEmpty()) {
                 inventory.set(1, recipeOutput.copy());
             } else if (output.getItem() == recipeOutput.getItem()) {
                 output.addAmount(recipeOutput.getAmount());
@@ -142,8 +159,7 @@ public class CrucibleBlockEntity extends BlockEntity implements SidedInventory, 
             if (input.isEmpty()) {
                 return;
             }
-            CrucibleRecipe recipe = world.getRecipeManager()
-                    .getFirstMatch(ExMateriaRecipes.CRUCIBLE_RECIPE, this, world).orElse(null);
+            CrucibleRecipe recipe = getCachedRecipe();
             if (recipe == null) {
                 dropItems(input);
                 return;
